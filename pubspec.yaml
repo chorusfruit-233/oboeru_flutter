@@ -1,0 +1,29 @@
+name: oboeru_flutter
+description: A Flutter vocabulary learning app.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^6.1.2
+  shared_preferences: ^2.3.4
+  path_provider: ^2.1.5
+  file_picker: ^8.1.7
+  intl: ^0.19.0
+  http: ^1.2.0
+  flutter_tts: ^4.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/sample_vocabulary.txt
+    - assets/sample_vocabulary.json

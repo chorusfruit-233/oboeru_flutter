@@ -1,0 +1,248 @@
+{
+  "name": "示例词库",
+  "language": "en",
+  "description": "Oboeru 内置示例词库，采用现代 JSON 格式",
+  "version": 1,
+  "words": [
+    {
+      "word": "apple",
+      "pronunciation": "/ˈæp.əl/",
+      "pos": "n.",
+      "meaning": "苹果",
+      "example": "I eat an apple every morning.",
+      "exampleMeaning": "我每天早上吃一个苹果。",
+      "tag": "food",
+      "difficulty": 1
+    },
+    {
+      "word": "banana",
+      "pronunciation": "/bəˈnæn.ə/",
+      "pos": "n.",
+      "meaning": "香蕉",
+      "example": "Monkeys love bananas.",
+      "exampleMeaning": "猴子喜欢香蕉。",
+      "tag": "food",
+      "difficulty": 1
+    },
+    {
+      "word": "cat",
+      "pronunciation": "/kæt/",
+      "pos": "n.",
+      "meaning": "猫",
+      "example": "The cat is sleeping on the sofa.",
+      "exampleMeaning": "猫正在沙发上睡觉。",
+      "tag": "animal",
+      "difficulty": 1
+    },
+    {
+      "word": "dog",
+      "pronunciation": "/dɒɡ/",
+      "pos": "n.",
+      "meaning": "狗",
+      "example": "The dog is playing in the yard.",
+      "exampleMeaning": "狗正在院子里玩耍。",
+      "tag": "animal",
+      "difficulty": 1
+    },
+    {
+      "word": "good",
+      "pronunciation": "/ɡʊd/",
+      "pos": "adj.",
+      "meaning": "好的",
+      "example": "She is a good student.",
+      "exampleMeaning": "她是一个好学生。",
+      "tag": "adjective",
+      "difficulty": 1
+    },
+    {
+      "word": "book",
+      "pronunciation": "/bʊk/",
+      "pos": "n.",
+      "meaning": "书",
+      "example": "I am reading an interesting book.",
+      "exampleMeaning": "我正在读一本有趣的书。",
+      "tag": "education",
+      "difficulty": 1
+    },
+    {
+      "word": "water",
+      "pronunciation": "/ˈwɔː.tər/",
+      "pos": "n.",
+      "meaning": "水",
+      "example": "Please give me a glass of water.",
+      "exampleMeaning": "请给我一杯水。",
+      "tag": "food",
+      "difficulty": 1
+    },
+    {
+      "word": "sun",
+      "pronunciation": "/sʌn/",
+      "pos": "n.",
+      "meaning": "太阳",
+      "example": "The sun rises in the east.",
+      "exampleMeaning": "太阳从东方升起。",
+      "tag": "nature",
+      "difficulty": 1
+    },
+    {
+      "word": "moon",
+      "pronunciation": "/muːn/",
+      "pos": "n.",
+      "meaning": "月亮",
+      "example": "The full moon is very bright tonight.",
+      "exampleMeaning": "今晚的满月非常明亮。",
+      "tag": "nature",
+      "difficulty": 1
+    },
+    {
+      "word": "star",
+      "pronunciation": "/stɑːr/",
+      "pos": "n.",
+      "meaning": "星星",
+      "example": "There are many stars in the sky.",
+      "exampleMeaning": "天空中有很多星星。",
+      "tag": "nature",
+      "difficulty": 1
+    },
+    {
+      "word": "fish",
+      "pronunciation": "/fɪʃ/",
+      "pos": "n.",
+      "meaning": "鱼",
+      "example": "We went fishing and caught a big fish.",
+      "exampleMeaning": "我们去钓鱼，钓到了一条大鱼。",
+      "tag": "animal",
+      "difficulty": 1
+    },
+    {
+      "word": "bird",
+      "pronunciation": "/bɜːrd/",
+      "pos": "n.",
+      "meaning": "鸟",
+      "example": "A beautiful bird is singing in the tree.",
+      "exampleMeaning": "一只美丽的鸟在树上唱歌。",
+      "tag": "animal",
+      "difficulty": 1
+    },
+    {
+      "word": "tree",
+      "pronunciation": "/triː/",
+      "pos": "n.",
+      "meaning": "树",
+      "example": "There is a tall tree in front of my house.",
+      "exampleMeaning": "我家门前有一棵高大的树。",
+      "tag": "nature",
+      "difficulty": 1
+    },
+    {
+      "word": "flower",
+      "pronunciation": "/ˈflaʊ.ər/",
+      "pos": "n.",
+      "meaning": "花",
+      "example": "The flowers bloom in spring.",
+      "exampleMeaning": "花在春天绽放。",
+      "tag": "nature",
+      "difficulty": 1
+    },
+    {
+      "word": "house",
+      "pronunciation": "/haʊs/",
+      "pos": "n.",
+      "meaning": "房子",
+      "example": "They live in a big house.",
+      "exampleMeaning": "他们住在一所大房子里。",
+      "tag": "place",
+      "difficulty": 1
+    },
+    {
+      "word": "happy",
+      "pronunciation": "/ˈhæp.i/",
+      "pos": "adj.",
+      "meaning": "快乐的",
+      "example": "The children look very happy.",
+      "exampleMeaning": "孩子们看起来很开心。",
+      "tag": "adjective",
+      "difficulty": 1
+    },
+    {
+      "word": "sad",
+      "pronunciation": "/sæd/",
+      "pos": "adj.",
+      "meaning": "悲伤的",
+      "example": "Don't be sad, everything will be fine.",
+      "exampleMeaning": "别难过，一切都会好起来的。",
+      "tag": "adjective",
+      "difficulty": 1
+    },
+    {
+      "word": "big",
+      "pronunciation": "/bɪɡ/",
+      "pos": "adj.",
+      "meaning": "大的",
+      "example": "The elephant is very big.",
+      "exampleMeaning": "大象非常大。",
+      "tag": "adjective",
+      "difficulty": 1
+    },
+    {
+      "word": "small",
+      "pronunciation": "/smɔːl/",
+      "pos": "adj.",
+      "meaning": "小的",
+      "example": "The kitten is very small and cute.",
+      "exampleMeaning": "小猫非常小，很可爱。",
+      "tag": "adjective",
+      "difficulty": 1
+    },
+    {
+      "word": "run",
+      "pronunciation": "/rʌn/",
+      "pos": "v.",
+      "meaning": "跑步",
+      "example": "He runs five kilometers every day.",
+      "exampleMeaning": "他每天跑五公里。",
+      "tag": "verb",
+      "difficulty": 1
+    },
+    {
+      "word": "eat",
+      "pronunciation": "/iːt/",
+      "pos": "v.",
+      "meaning": "吃",
+      "example": "Let's eat lunch together.",
+      "exampleMeaning": "我们一起吃午餐吧。",
+      "tag": "verb",
+      "difficulty": 1
+    },
+    {
+      "word": "sleep",
+      "pronunciation": "/sliːp/",
+      "pos": "v.",
+      "meaning": "睡觉",
+      "example": "I usually sleep for eight hours.",
+      "exampleMeaning": "我通常睡八个小时。",
+      "tag": "verb",
+      "difficulty": 1
+    },
+    {
+      "word": "read",
+      "pronunciation": "/riːd/",
+      "pos": "v.",
+      "meaning": "阅读",
+      "example": "She reads a book before bed every night.",
+      "exampleMeaning": "她每晚睡前都会读一本书。",
+      "tag": "verb",
+      "difficulty": 1
+    },
+    {
+      "word": "write",
+      "pronunciation": "/raɪt/",
+      "pos": "v.",
+      "meaning": "写",
+      "example": "Please write down your name here.",
+      "exampleMeaning": "请在这里写下你的名字。",
+      "tag": "verb",
+      "difficulty": 1
+    }
+  ]
+}

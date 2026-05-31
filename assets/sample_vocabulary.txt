@@ -1,0 +1,26 @@
+# Oboeru Sample Vocabulary
+# Format: word\tpos\tmeaning\t[wrongOptions]
+apple	n.	苹果
+banana	n.	香蕉
+cat	n.	猫	cart,cut,cap
+dog	n.	狗
+good	adj.	好的	god,food,wood
+book	n.	书	look,cook,back
+water	n.	水	waiter,winter,wet
+sun	n.	太阳	sand,son,sing
+moon	n.	月亮	mood,noon,monk
+star	n.	星星	start,stir,store
+fish	n.	鱼	fresh,finish,dish
+bird	n.	鸟	bed,board,birth
+tree	n.	树	three,train,trip
+flower	n.	花	flour,floor,flow
+house	n.	房子	horse,hurt,hose
+happy	adj.	快乐的	hippo,happen,hippy
+sad	adj.	悲伤的	sand,sat,say
+big	adj.	大的	bag,beg,bit
+small	adj.	小的	smell,snail,snow
+run	v.	跑步	fun,rain,red
+eat	v.	吃	at,ate,east
+sleep	v.	睡觉	slip,sheep,sweep
+read	v.	阅读	red,ride,road
+write	v.	写	right,white,wide
