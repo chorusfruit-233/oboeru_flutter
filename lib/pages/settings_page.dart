@@ -6,7 +6,6 @@ import '../providers/settings_provider.dart';
 import '../providers/vocabulary_provider.dart';
 import '../providers/ai_provider.dart';
 import '../providers/tts_provider.dart';
-import '../services/storage_service.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -132,9 +131,7 @@ class SettingsPage extends StatelessWidget {
     SettingsProvider settingsProv,
     double fontSize,
   ) {
-    final fileName = settings.vocabFilePath != null
-        ? settings.vocabFilePath!.split('/').last
-        : null;
+    final fileName = settings.vocabFilePath?.split('/').last;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,7 +304,7 @@ class SettingsPage extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
-            value: settings.aiDifficulty,
+            initialValue: settings.aiDifficulty,
             decoration: InputDecoration(
               labelText: '难度',
               border: const OutlineInputBorder(),
@@ -356,7 +353,7 @@ class SettingsPage extends StatelessWidget {
             onChanged: (v) => settingsProv.updateAiMaxTokens(v.round()),
           ),
           DropdownButtonFormField<String>(
-            value: settings.aiReasoningEffort,
+            initialValue: settings.aiReasoningEffort,
             decoration: InputDecoration(
               labelText: '推理模式',
               border: const OutlineInputBorder(),

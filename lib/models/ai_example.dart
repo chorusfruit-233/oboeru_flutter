@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class AiExample {
   final String sentence;
   final String translation;
@@ -19,5 +21,3 @@ class AiExample {
     }
   }
 }
-
-import 'dart:convert';

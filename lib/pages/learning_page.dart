@@ -106,9 +106,10 @@ class LearningPage extends StatelessWidget {
                     : null,
                 onSpeakExample: settings.ttsEnabled && displayExample != null
                     ? () {
-                        final en = displayExample!.contains('||')
-                            ? displayExample!.split('||').first.trim()
-                            : displayExample!;
+                        final ex = displayExample!;
+                        final en = ex.contains('||')
+                            ? ex.split('||').first.trim()
+                            : ex;
                         context.read<TTSProvider>().speak(en);
                       }
                     : null,

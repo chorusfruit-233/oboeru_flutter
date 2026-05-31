@@ -26,9 +26,7 @@ class VocabularyPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fileName = currentFilePath != null
-        ? currentFilePath!.split('/').last
-        : null;
+    final fileName = currentFilePath?.split('/').last;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -67,7 +67,7 @@ class AIProvider extends ChangeNotifier {
 
     if (_examples.containsKey(word)) return _examples[word];
 
-    final cached = await _cache.get(word, difficulty);
+    final cached = _cache.get(word, difficulty);
     if (cached != null) {
       _examples[word] = cached;
       return cached;
@@ -132,7 +132,7 @@ class AIProvider extends ChangeNotifier {
         continue;
       }
 
-      final cached = await _cache.get(w.word, difficulty);
+      final cached = _cache.get(w.word, difficulty);
       if (cached != null) {
         _examples[w.word] = cached;
         _preGenerateCurrent++;

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/settings.dart';
-import '../models/word.dart';
 import '../providers/vocabulary_provider.dart';
 import '../providers/learning_provider.dart';
 import '../providers/settings_provider.dart';

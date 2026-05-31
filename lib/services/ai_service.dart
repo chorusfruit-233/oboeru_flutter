@@ -66,7 +66,7 @@ class AIService {
             {
               'role': 'user',
               'content':
-                  'Generate an example sentence for the word "$word" (${meaning}). '
+                  'Generate an example sentence for the word "$word" ($meaning). '
                   'Return the sentence followed by "||" followed by its Chinese translation. No other text.',
             },
           ],
