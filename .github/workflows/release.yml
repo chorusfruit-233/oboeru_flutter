@@ -1,0 +1,221 @@
+name: Manual Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号 tag（留空则不创建 tag，如 v1.0.0）'
+        required: false
+        type: string
+      build-linux:
+        description: 'Linux'
+        type: boolean
+        default: true
+      build-macos:
+        description: 'macOS'
+        type: boolean
+        default: true
+      build-windows:
+        description: 'Windows'
+        type: boolean
+        default: true
+      build-android:
+        description: 'Android'
+        type: boolean
+        default: true
+      build-ios:
+        description: 'iOS'
+        type: boolean
+        default: false
+      build-web:
+        description: 'Web'
+        type: boolean
+        default: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  tag:
+    name: Create Tag
+    runs-on: ubuntu-latest
+    if: ${{ inputs.version != '' }}
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create and push tag
+        id: tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          if git rev-parse "${{ inputs.version }}" >/dev/null 2>&1; then
+            echo "Tag ${{ inputs.version }} already exists, skipping."
+          else
+            git tag -a "${{ inputs.version }}" -m "Release ${{ inputs.version }}"
+            git push origin "${{ inputs.version }}"
+          fi
+          echo "tag=${{ inputs.version }}" >> $GITHUB_OUTPUT
+
+  build-linux:
+    name: Linux
+    if: ${{ inputs.build-linux && !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: |
+          sudo apt-get update -y
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+      - run: flutter pub get
+      - run: flutter build linux --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oboeru-linux
+          path: build/linux/x64/release/bundle/
+          retention-days: 7
+
+  build-macos:
+    name: macOS
+    if: ${{ inputs.build-macos && !cancelled() }}
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build macos --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oboeru-macos
+          path: build/macos/Build/Products/Release/
+          retention-days: 7
+
+  build-windows:
+    name: Windows
+    if: ${{ inputs.build-windows && !cancelled() }}
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build windows --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oboeru-windows
+          path: build/windows/x64/runner/Release/
+          retention-days: 7
+
+  build-android:
+    name: Android
+    if: ${{ inputs.build-android && !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter clean
+      - run: flutter pub get
+      - run: flutter build apk --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oboeru-android
+          path: build/app/outputs/flutter-apk/
+          retention-days: 7
+
+  build-ios:
+    name: iOS
+    if: ${{ inputs.build-ios && !cancelled() }}
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oboeru-ios
+          path: build/ios/iphoneos/
+          retention-days: 7
+
+  build-web:
+    name: Web
+    if: ${{ inputs.build-web && !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build web --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oboeru-web
+          path: build/web/
+          retention-days: 7
+
+  release:
+    name: Create Release
+    if: ${{ always() && inputs.version != '' && !cancelled() }}
+    needs: [build-linux, build-macos, build-windows, build-android, build-ios, build-web]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Package artifacts
+        run: |
+          mkdir -p dist
+          if [ -d "oboeru-linux" ]; then
+            tar czf dist/oboeru-linux.tar.gz -C oboeru-linux .
+          fi
+          if [ -d "oboeru-macos" ]; then
+            tar czf dist/oboeru-macos.tar.gz -C oboeru-macos .
+          fi
+          if [ -d "oboeru-windows" ]; then
+            (cd oboeru-windows && zip -9qr ../dist/oboeru-windows.zip .)
+          fi
+          if [ -d "oboeru-android" ]; then
+            find oboeru-android -name "*.apk" -exec cp {} dist/ \;
+          fi
+          if [ -d "oboeru-ios" ]; then
+            tar czf dist/oboeru-ios.tar.gz -C oboeru-ios .
+          fi
+          if [ -d "oboeru-web" ]; then
+            tar czf dist/oboeru-web.tar.gz -C oboeru-web .
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version }}
+          name: Release ${{ inputs.version }}
+          body: |
+            ## Oboeru ${{ inputs.version }}
+
+            智能背单词 — AI 例句生成 + TTS 语音 + 跨平台。
+
+            | 平台 | 文件 |
+            |------|------|
+            | Linux 🐧 | `oboeru-linux.tar.gz` |
+            | macOS 🍎 | `oboeru-macos.tar.gz` |
+            | Windows 🪟 | `oboeru-windows.zip` |
+            | Android 🤖 | `*.apk` |
+            | Web 🌐 | `oboeru-web.tar.gz` |
+          draft: false
+          prerelease: false
+          files: |
+            dist/*
