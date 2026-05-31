@@ -144,6 +144,22 @@ jobs:
         with:
           channel: stable
       - run: flutter clean
+      - name: Setup keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > upload-keystore.jks
+            printf '%s\n' \
+              'storeFile=../upload-keystore.jks' \
+              "storePassword=$KEYSTORE_PASSWORD" \
+              "keyAlias=$KEY_ALIAS" \
+              "keyPassword=$KEY_PASSWORD" \
+              > android/key.properties
+          fi
       - run: flutter pub get
       - run: flutter build apk --release --split-per-abi
       - name: Upload arm64-v8a
