@@ -16,7 +16,7 @@ class VocabularyPicker extends StatelessWidget {
   Future<void> _pickFile(BuildContext context) async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['txt'],
+      allowedExtensions: ['txt', 'json'],
     );
 
     if (result != null && result.files.single.path != null) {
