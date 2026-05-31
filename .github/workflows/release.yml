@@ -8,23 +8,27 @@ on:
         required: false
         type: string
       build-linux:
-        description: 'Linux'
+        description: 'Linux (x86_64)'
         type: boolean
         default: true
-      build-macos:
-        description: 'macOS'
+      build-macos-arm64:
+        description: 'macOS (Apple Silicon / arm64)'
         type: boolean
         default: true
+      build-macos-x64:
+        description: 'macOS (Intel / x86_64)'
+        type: boolean
+        default: false
       build-windows:
-        description: 'Windows'
+        description: 'Windows (x86_64)'
         type: boolean
         default: true
       build-android:
-        description: 'Android'
+        description: 'Android (arm64-v8a, armeabi-v7a, x86_64)'
         type: boolean
         default: true
       build-ios:
-        description: 'iOS'
+        description: 'iOS (arm64, 未签名)'
         type: boolean
         default: false
       build-web:
@@ -60,7 +64,7 @@ jobs:
           echo "tag=${{ inputs.version }}" >> $GITHUB_OUTPUT
 
   build-linux:
-    name: Linux
+    name: Linux-x86_64
     if: ${{ inputs.build-linux && !cancelled() }}
     runs-on: ubuntu-latest
     steps:
@@ -75,13 +79,13 @@ jobs:
       - run: flutter build linux --release
       - uses: actions/upload-artifact@v7
         with:
-          name: oboeru-linux
+          name: oboeru-linux-x86_64
           path: build/linux/x64/release/bundle/
           retention-days: 7
 
-  build-macos:
-    name: macOS
-    if: ${{ inputs.build-macos && !cancelled() }}
+  build-macos-arm64:
+    name: macOS-arm64
+    if: ${{ inputs.build-macos-arm64 && !cancelled() }}
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
@@ -92,12 +96,29 @@ jobs:
       - run: flutter build macos --release
       - uses: actions/upload-artifact@v7
         with:
-          name: oboeru-macos
+          name: oboeru-macos-arm64
+          path: build/macos/Build/Products/Release/
+          retention-days: 7
+
+  build-macos-x64:
+    name: macOS-x86_64
+    if: ${{ inputs.build-macos-x64 && !cancelled() }}
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build macos --release
+      - uses: actions/upload-artifact@v7
+        with:
+          name: oboeru-macos-x86_64
           path: build/macos/Build/Products/Release/
           retention-days: 7
 
   build-windows:
-    name: Windows
+    name: Windows-x86_64
     if: ${{ inputs.build-windows && !cancelled() }}
     runs-on: windows-latest
     steps:
@@ -109,7 +130,7 @@ jobs:
       - run: flutter build windows --release
       - uses: actions/upload-artifact@v7
         with:
-          name: oboeru-windows
+          name: oboeru-windows-x86_64
           path: build/windows/x64/runner/Release/
           retention-days: 7
 
@@ -124,15 +145,28 @@ jobs:
           channel: stable
       - run: flutter clean
       - run: flutter pub get
-      - run: flutter build apk --release
-      - uses: actions/upload-artifact@v7
+      - run: flutter build apk --release --split-per-abi
+      - name: Upload arm64-v8a
+        uses: actions/upload-artifact@v7
         with:
-          name: oboeru-android
-          path: build/app/outputs/flutter-apk/
+          name: oboeru-android-arm64-v8a
+          path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+          retention-days: 7
+      - name: Upload armeabi-v7a
+        uses: actions/upload-artifact@v7
+        with:
+          name: oboeru-android-armeabi-v7a
+          path: build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+          retention-days: 7
+      - name: Upload x86_64
+        uses: actions/upload-artifact@v7
+        with:
+          name: oboeru-android-x86_64
+          path: build/app/outputs/flutter-apk/app-x86_64-release.apk
           retention-days: 7
 
   build-ios:
-    name: iOS
+    name: iOS-arm64
     if: ${{ inputs.build-ios && !cancelled() }}
     runs-on: macos-latest
     steps:
@@ -144,7 +178,7 @@ jobs:
       - run: flutter build ios --release --no-codesign
       - uses: actions/upload-artifact@v7
         with:
-          name: oboeru-ios
+          name: oboeru-ios-arm64
           path: build/ios/iphoneos/
           retention-days: 7
 
@@ -168,7 +202,7 @@ jobs:
   release:
     name: Create Release
     if: ${{ always() && inputs.version != '' && !cancelled() }}
-    needs: [build-linux, build-macos, build-windows, build-android, build-ios, build-web]
+    needs: [build-linux, build-macos-arm64, build-macos-x64, build-windows, build-android, build-ios, build-web]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -179,20 +213,29 @@ jobs:
       - name: Package artifacts
         run: |
           mkdir -p dist
-          if [ -d "oboeru-linux" ]; then
-            tar czf dist/oboeru-linux.tar.gz -C oboeru-linux .
+          if [ -d "oboeru-linux-x86_64" ]; then
+            tar czf dist/oboeru-linux-x86_64.tar.gz -C oboeru-linux-x86_64 .
           fi
-          if [ -d "oboeru-macos" ]; then
-            tar czf dist/oboeru-macos.tar.gz -C oboeru-macos .
+          if [ -d "oboeru-macos-arm64" ]; then
+            tar czf dist/oboeru-macos-arm64.tar.gz -C oboeru-macos-arm64 .
           fi
-          if [ -d "oboeru-windows" ]; then
-            (cd oboeru-windows && zip -9qr ../dist/oboeru-windows.zip .)
+          if [ -d "oboeru-macos-x86_64" ]; then
+            tar czf dist/oboeru-macos-x86_64.tar.gz -C oboeru-macos-x86_64 .
           fi
-          if [ -d "oboeru-android" ]; then
-            find oboeru-android -name "*.apk" -exec cp {} dist/ \;
+          if [ -d "oboeru-windows-x86_64" ]; then
+            (cd oboeru-windows-x86_64 && zip -9qr ../dist/oboeru-windows-x86_64.zip .)
           fi
-          if [ -d "oboeru-ios" ]; then
-            tar czf dist/oboeru-ios.tar.gz -C oboeru-ios .
+          if [ -d "oboeru-android-arm64-v8a" ]; then
+            cp oboeru-android-arm64-v8a/*.apk dist/ 2>/dev/null || true
+          fi
+          if [ -d "oboeru-android-armeabi-v7a" ]; then
+            cp oboeru-android-armeabi-v7a/*.apk dist/ 2>/dev/null || true
+          fi
+          if [ -d "oboeru-android-x86_64" ]; then
+            cp oboeru-android-x86_64/*.apk dist/ 2>/dev/null || true
+          fi
+          if [ -d "oboeru-ios-arm64" ]; then
+            tar czf dist/oboeru-ios-arm64.tar.gz -C oboeru-ios-arm64 .
           fi
           if [ -d "oboeru-web" ]; then
             tar czf dist/oboeru-web.tar.gz -C oboeru-web .
@@ -208,13 +251,17 @@ jobs:
 
             智能背单词 — AI 例句生成 + TTS 语音 + 跨平台。
 
-            | 平台 | 文件 |
-            |------|------|
-            | Linux 🐧 | `oboeru-linux.tar.gz` |
-            | macOS 🍎 | `oboeru-macos.tar.gz` |
-            | Windows 🪟 | `oboeru-windows.zip` |
-            | Android 🤖 | `*.apk` |
-            | Web 🌐 | `oboeru-web.tar.gz` |
+            | 平台 | 架构 | 文件 |
+            |------|------|------|
+            | Linux | x86_64 | `oboeru-linux-x86_64.tar.gz` |
+            | macOS | arm64 (Apple Silicon) | `oboeru-macos-arm64.tar.gz` |
+            | macOS | x86_64 (Intel) | `oboeru-macos-x86_64.tar.gz` |
+            | Windows | x86_64 | `oboeru-windows-x86_64.zip` |
+            | Android | arm64-v8a | `app-arm64-v8a-release.apk` |
+            | Android | armeabi-v7a | `app-armeabi-v7a-release.apk` |
+            | Android | x86_64 | `app-x86_64-release.apk` |
+            | iOS | arm64 | `oboeru-ios-arm64.tar.gz` (未签名) |
+            | Web | - | `oboeru-web.tar.gz` |
           draft: false
           prerelease: false
           files: |
