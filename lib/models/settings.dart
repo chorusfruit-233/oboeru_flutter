@@ -19,6 +19,11 @@ class AppSettings {
   final String ttsProvider;
   final bool ttsAutoSpeak;
 
+  // SRS (spaced repetition)
+  final bool srsEnabled;
+  final int newCardsPerDay;
+  final int maxReviewsPerDay;
+
   const AppSettings({
     this.dailyWords = 20,
     this.shuffle = true,
@@ -40,6 +45,9 @@ class AppSettings {
     this.ttsEnabled = false,
     this.ttsProvider = '',
     this.ttsAutoSpeak = false,
+    this.srsEnabled = true,
+    this.newCardsPerDay = 10,
+    this.maxReviewsPerDay = 0,
   });
 
   final bool aiAutoGenerate;
@@ -69,6 +77,9 @@ class AppSettings {
     bool? ttsEnabled,
     String? ttsProvider,
     bool? ttsAutoSpeak,
+    bool? srsEnabled,
+    int? newCardsPerDay,
+    int? maxReviewsPerDay,
   }) {
     return AppSettings(
       dailyWords: dailyWords ?? this.dailyWords,
@@ -91,6 +102,9 @@ class AppSettings {
       ttsEnabled: ttsEnabled ?? this.ttsEnabled,
       ttsProvider: ttsProvider ?? this.ttsProvider,
       ttsAutoSpeak: ttsAutoSpeak ?? this.ttsAutoSpeak,
+      srsEnabled: srsEnabled ?? this.srsEnabled,
+      newCardsPerDay: newCardsPerDay ?? this.newCardsPerDay,
+      maxReviewsPerDay: maxReviewsPerDay ?? this.maxReviewsPerDay,
     );
   }
 
@@ -115,6 +129,9 @@ class AppSettings {
     'ttsEnabled': ttsEnabled,
     'ttsProvider': ttsProvider,
     'ttsAutoSpeak': ttsAutoSpeak,
+    'srsEnabled': srsEnabled,
+    'newCardsPerDay': newCardsPerDay,
+    'maxReviewsPerDay': maxReviewsPerDay,
   };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) => AppSettings(
@@ -138,5 +155,8 @@ class AppSettings {
     ttsEnabled: (json['ttsEnabled'] as bool?) ?? false,
     ttsProvider: (json['ttsProvider'] as String?) ?? '',
     ttsAutoSpeak: (json['ttsAutoSpeak'] as bool?) ?? false,
+    srsEnabled: (json['srsEnabled'] as bool?) ?? true,
+    newCardsPerDay: (json['newCardsPerDay'] as num?)?.toInt() ?? 10,
+    maxReviewsPerDay: (json['maxReviewsPerDay'] as num?)?.toInt() ?? 0,
   );
 }

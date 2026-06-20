@@ -21,6 +21,7 @@ class StorageService {
   String get vocabDirPath => '${_appDir.path}/vocabulary';
   String get progressPath => '${_appDir.path}/progress.json';
   String get favoritesPath => '${_appDir.path}/favorites.json';
+  String get srsPath => '${_appDir.path}/srs_state.json';
 
   Future<Directory> getVocabDir() async {
     final dir = Directory(vocabDirPath);

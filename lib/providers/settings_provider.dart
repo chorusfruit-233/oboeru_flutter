@@ -131,4 +131,22 @@ class SettingsProvider extends ChangeNotifier {
     await _service.save(_settings);
     notifyListeners();
   }
+
+  Future<void> updateSrsEnabled(bool value) async {
+    _settings = _settings.copyWith(srsEnabled: value);
+    await _service.save(_settings);
+    notifyListeners();
+  }
+
+  Future<void> updateNewCardsPerDay(int value) async {
+    _settings = _settings.copyWith(newCardsPerDay: value);
+    await _service.save(_settings);
+    notifyListeners();
+  }
+
+  Future<void> updateMaxReviewsPerDay(int value) async {
+    _settings = _settings.copyWith(maxReviewsPerDay: value);
+    await _service.save(_settings);
+    notifyListeners();
+  }
 }

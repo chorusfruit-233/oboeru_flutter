@@ -10,6 +10,7 @@ import 'package:oboeru_flutter/providers/favorites_provider.dart';
 import 'package:oboeru_flutter/providers/settings_provider.dart';
 import 'package:oboeru_flutter/providers/ai_provider.dart';
 import 'package:oboeru_flutter/providers/tts_provider.dart';
+import 'package:oboeru_flutter/providers/srs_provider.dart';
 
 Widget _wrapWithProviders(Widget child) {
   return MultiProvider(
@@ -21,6 +22,7 @@ Widget _wrapWithProviders(Widget child) {
       ChangeNotifierProvider(create: (_) => SettingsProvider()),
       ChangeNotifierProvider(create: (_) => AIProvider()),
       ChangeNotifierProvider(create: (_) => TTSProvider()),
+      ChangeNotifierProvider(create: (_) => SrsProvider()),
     ],
     child: child,
   );

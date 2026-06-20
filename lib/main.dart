@@ -7,6 +7,7 @@ import 'providers/favorites_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/ai_provider.dart';
 import 'providers/tts_provider.dart';
+import 'providers/srs_provider.dart';
 import 'services/storage_service.dart';
 import 'app.dart';
 
@@ -25,6 +26,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => SettingsProvider()..load()),
         ChangeNotifierProvider(create: (_) => AIProvider()),
         ChangeNotifierProvider(create: (_) => TTSProvider()),
+        ChangeNotifierProvider(create: (_) => SrsProvider()..load()),
       ],
       child: const OboeruApp(),
     ),

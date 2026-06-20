@@ -51,6 +51,10 @@ class SettingsPage extends StatelessWidget {
                 ),
                 const Divider(height: 32),
 
+                _buildSectionTitle('科学复习 (SRS)', fontSize),
+                _buildSrsSection(context, settings, settingsProv, fontSize),
+                const Divider(height: 32),
+
                 _buildSectionTitle('词库管理', fontSize),
                 _buildVocabPicker(context, vocabProv, settings, settingsProv, fontSize),
                 const Divider(height: 32),
@@ -223,6 +227,57 @@ class SettingsPage extends StatelessWidget {
           label: settings.fontSize.round().toString(),
           onChanged: (v) => prov.updateFontSize(v),
         ),
+      ],
+    );
+  }
+
+  Widget _buildSrsSection(
+    BuildContext context,
+    AppSettings settings,
+    SettingsProvider prov,
+    double fontSize,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SwitchListTile(
+          title: Text('启用间隔重复', style: TextStyle(fontSize: fontSize)),
+          subtitle: Text(
+            '基于 SM-2 算法安排复习，科学记忆',
+            style: TextStyle(fontSize: fontSize * 0.85),
+          ),
+          value: settings.srsEnabled,
+          onChanged: (v) => prov.updateSrsEnabled(v),
+          contentPadding: EdgeInsets.zero,
+        ),
+        if (settings.srsEnabled) ...[
+          const SizedBox(height: 8),
+          Text('每日新词数: ${settings.newCardsPerDay}',
+              style: TextStyle(fontSize: fontSize)),
+          Slider(
+            value: settings.newCardsPerDay.toDouble(),
+            min: 1,
+            max: 50,
+            divisions: 49,
+            label: settings.newCardsPerDay.toString(),
+            onChanged: (v) => prov.updateNewCardsPerDay(v.round()),
+          ),
+          const SizedBox(height: 4),
+          Text('每日最大复习数: ${settings.maxReviewsPerDay == 0 ? "不限" : settings.maxReviewsPerDay}',
+              style: TextStyle(fontSize: fontSize)),
+          Slider(
+            value: settings.maxReviewsPerDay.toDouble(),
+            min: 0,
+            max: 200,
+            divisions: 40,
+            label: settings.maxReviewsPerDay == 0 ? '不限' : settings.maxReviewsPerDay.toString(),
+            onChanged: (v) => prov.updateMaxReviewsPerDay(v.round()),
+          ),
+          Text(
+            '0 = 不限。每日总量受"每日单词数"约束，新词在剩余配额内加入。',
+            style: TextStyle(fontSize: fontSize * 0.75, color: Colors.grey),
+          ),
+        ],
       ],
     );
   }

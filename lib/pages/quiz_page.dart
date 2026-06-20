@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/word.dart';
+import '../models/settings.dart';
 import '../providers/quiz_provider.dart';
 import '../providers/settings_provider.dart';
 import '../providers/learning_provider.dart';
 import '../providers/tts_provider.dart';
+import '../providers/srs_provider.dart';
+import '../providers/vocabulary_provider.dart';
 import '../widgets/option_button.dart';
 import '../widgets/progress_bar_widget.dart';
 import 'review_page.dart';
@@ -24,12 +27,27 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
+  bool _srsRecorded = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<QuizProvider>().startQuiz(widget.words, widget.allWords);
     });
+  }
+
+  Future<void> _recordToSrs(QuizProvider quizProv) async {
+    if (_srsRecorded) return;
+    _srsRecorded = true;
+    final srsProv = context.read<SrsProvider>();
+    final vocabProv = context.read<VocabularyProvider>();
+    for (final q in quizProv.questions) {
+      if (q.isAnswered) {
+        await srsProv.recordQuizResult(q.word.word, q.isCorrect);
+      }
+    }
+    srsProv.refreshStats(vocabProv.allWords);
   }
 
   @override
@@ -40,7 +58,10 @@ class _QuizPageState extends State<QuizPage> {
     final ttsEnabled = settings.ttsEnabled;
 
     if (quizProv.finished) {
-      return _buildResults(context, quizProv, fontSize);
+      if (settings.srsEnabled) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => _recordToSrs(quizProv));
+      }
+      return _buildResults(context, quizProv, settings, fontSize);
     }
 
     final question = quizProv.currentQuestion;
@@ -187,7 +208,7 @@ class _QuizPageState extends State<QuizPage> {
     );
   }
 
-  Widget _buildResults(BuildContext context, QuizProvider prov, double fontSize) {
+  Widget _buildResults(BuildContext context, QuizProvider prov, AppSettings settings, double fontSize) {
     final total = prov.totalCount;
     final correct = prov.correctCount;
     final accuracy = total > 0 ? (correct / total * 100).toStringAsFixed(0) : '0';
@@ -233,6 +254,20 @@ class _QuizPageState extends State<QuizPage> {
                   _buildStat('总题', total.toString(), Colors.blue, fontSize),
                 ],
               ),
+              if (settings.srsEnabled) ...[
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.timeline, size: fontSize * 0.9, color: Colors.green),
+                    const SizedBox(width: 6),
+                    Text(
+                      '已按答题结果更新复习进度',
+                      style: TextStyle(fontSize: fontSize * 0.8, color: Colors.green),
+                    ),
+                  ],
+                ),
+              ],
               if (prov.incorrectWords.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 Text(
@@ -273,8 +308,13 @@ class _QuizPageState extends State<QuizPage> {
                 height: 56,
                 child: FilledButton.icon(
                   onPressed: () {
-                    Navigator.of(context).pop();
-                    context.read<LearningProvider>().reset();
+                    if (settings.srsEnabled) {
+                      context.read<SrsProvider>().reset();
+                      Navigator.of(context).popUntil((r) => r.isFirst);
+                    } else {
+                      Navigator.of(context).pop();
+                      context.read<LearningProvider>().reset();
+                    }
                   },
                   icon: const Icon(Icons.home),
                   label: Text(
