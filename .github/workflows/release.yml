@@ -47,7 +47,7 @@ jobs:
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Create and push tag
@@ -68,7 +68,7 @@ jobs:
     if: ${{ inputs.build-linux && !cancelled() }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -88,7 +88,7 @@ jobs:
     if: ${{ inputs.build-macos-arm64 && !cancelled() }}
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -105,7 +105,7 @@ jobs:
     if: ${{ inputs.build-macos-x64 && !cancelled() }}
     runs-on: macos-13
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -122,7 +122,7 @@ jobs:
     if: ${{ inputs.build-windows && !cancelled() }}
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -139,7 +139,7 @@ jobs:
     if: ${{ inputs.build-android && !cancelled() }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -186,7 +186,7 @@ jobs:
     if: ${{ inputs.build-ios && !cancelled() }}
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -203,7 +203,7 @@ jobs:
     if: ${{ inputs.build-web && !cancelled() }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -221,7 +221,7 @@ jobs:
     needs: [build-linux, build-macos-arm64, build-macos-x64, build-windows, build-android, build-ios, build-web]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Download all artifacts
         uses: actions/download-artifact@v8
