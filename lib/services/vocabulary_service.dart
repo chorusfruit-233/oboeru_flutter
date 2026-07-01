@@ -46,18 +46,19 @@ class VocabularyService {
     return words;
   }
 
-  List<String> generateOptions(Word correctWord, List<Word> allWords, {int optionCount = 4}) {
+  List<String> generateOptions(Word correctWord, List<Word> allWords,
+      {int optionCount = 4}) {
     final options = <String>{correctWord.meaning};
 
     final pool = List<Word>.from(allWords)..shuffle();
     for (final word in pool) {
       if (options.length >= optionCount) break;
-      if (word.word != correctWord.word) {
+      if (word.word != correctWord.word && word.meaning.isNotEmpty) {
         options.add(word.meaning);
       }
     }
 
     final result = options.toList()..shuffle();
-    return result.sublist(0, optionCount);
+    return result.take(optionCount).toList();
   }
 }

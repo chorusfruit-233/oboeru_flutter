@@ -7,8 +7,26 @@ import '../providers/vocabulary_provider.dart';
 import '../providers/ai_provider.dart';
 import '../providers/tts_provider.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  final TextEditingController _aiApiKeyController = TextEditingController();
+  final TextEditingController _aiCustomUrlController = TextEditingController();
+  final TextEditingController _aiCustomModelController =
+      TextEditingController();
+
+  @override
+  void dispose() {
+    _aiApiKeyController.dispose();
+    _aiCustomUrlController.dispose();
+    _aiCustomModelController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +36,8 @@ class SettingsPage extends StatelessWidget {
     final ttsProv = context.watch<TTSProvider>();
     final settings = settingsProv.settings;
     final fontSize = settings.fontSize;
+
+    _syncAiControllers(settings);
 
     return Scaffold(
       appBar: AppBar(
@@ -30,7 +50,8 @@ class SettingsPage extends StatelessWidget {
               padding: const EdgeInsets.all(24),
               children: [
                 _buildSectionTitle('学习设置', fontSize),
-                _buildDailyWordsSlider(context, settings, settingsProv, fontSize),
+                _buildDailyWordsSlider(
+                    context, settings, settingsProv, fontSize),
                 const Divider(height: 32),
                 _buildSwitchTile(
                   context,
@@ -50,30 +71,42 @@ class SettingsPage extends StatelessWidget {
                   (v) => settingsProv.updateShowProgressBar(v),
                 ),
                 const Divider(height: 32),
-
                 _buildSectionTitle('科学复习 (SRS)', fontSize),
                 _buildSrsSection(context, settings, settingsProv, fontSize),
                 const Divider(height: 32),
-
                 _buildSectionTitle('词库管理', fontSize),
-                _buildVocabPicker(context, vocabProv, settings, settingsProv, fontSize),
+                _buildVocabPicker(
+                    context, vocabProv, settings, settingsProv, fontSize),
                 const Divider(height: 32),
-
                 _buildSectionTitle('外观', fontSize),
                 _buildThemeSelector(context, settings, settingsProv, fontSize),
                 const Divider(height: 32),
                 _buildFontSizeSlider(context, settings, settingsProv, fontSize),
                 const Divider(height: 32),
-
                 _buildSectionTitle('AI 例句生成', fontSize),
-                _buildAiSection(context, settings, settingsProv, aiProv, fontSize),
+                _buildAiSection(
+                    context, settings, settingsProv, aiProv, fontSize),
                 const Divider(height: 32),
-
                 _buildSectionTitle('语音朗读 (TTS)', fontSize),
-                _buildTtsSection(context, settings, settingsProv, ttsProv, fontSize),
+                _buildTtsSection(
+                    context, settings, settingsProv, ttsProv, fontSize),
                 const SizedBox(height: 32),
               ],
             ),
+    );
+  }
+
+  void _syncAiControllers(AppSettings settings) {
+    _syncController(_aiApiKeyController, settings.aiApiKey);
+    _syncController(_aiCustomUrlController, settings.aiCustomUrl);
+    _syncController(_aiCustomModelController, settings.aiCustomModel);
+  }
+
+  void _syncController(TextEditingController controller, String value) {
+    if (controller.text == value) return;
+    controller.value = TextEditingValue(
+      text: value,
+      selection: TextSelection.collapsed(offset: value.length),
     );
   }
 
@@ -99,7 +132,8 @@ class SettingsPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('每日单词数: ${settings.dailyWords}', style: TextStyle(fontSize: fontSize)),
+        Text('每日单词数: ${settings.dailyWords}',
+            style: TextStyle(fontSize: fontSize)),
         Slider(
           value: settings.dailyWords.toDouble(),
           min: 1,
@@ -177,8 +211,12 @@ class SettingsPage extends StatelessWidget {
     );
 
     if (result != null && result.files.single.path != null) {
-      await vocabProv.importAndLoad(result.files.single.path!);
-      if (vocabProv.error == null && context.mounted) {
+      final savedPath =
+          await vocabProv.importAndLoad(result.files.single.path!);
+      if (savedPath != null) {
+        await settingsProv.updateVocabFilePath(savedPath);
+      }
+      if (savedPath != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('词库导入成功')),
         );
@@ -199,8 +237,12 @@ class SettingsPage extends StatelessWidget {
         const SizedBox(height: 8),
         SegmentedButton<String>(
           segments: const [
-            ButtonSegment(value: 'light', label: Text('浅色'), icon: Icon(Icons.light_mode)),
-            ButtonSegment(value: 'dark', label: Text('深色'), icon: Icon(Icons.dark_mode)),
+            ButtonSegment(
+                value: 'light',
+                label: Text('浅色'),
+                icon: Icon(Icons.light_mode)),
+            ButtonSegment(
+                value: 'dark', label: Text('深色'), icon: Icon(Icons.dark_mode)),
           ],
           selected: {settings.themeMode},
           onSelectionChanged: (v) => prov.updateThemeMode(v.first),
@@ -218,7 +260,8 @@ class SettingsPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('字体大小: ${settings.fontSize.round()}', style: TextStyle(fontSize: fontSize)),
+        Text('字体大小: ${settings.fontSize.round()}',
+            style: TextStyle(fontSize: fontSize)),
         Slider(
           value: settings.fontSize,
           min: 12,
@@ -263,14 +306,17 @@ class SettingsPage extends StatelessWidget {
             onChanged: (v) => prov.updateNewCardsPerDay(v.round()),
           ),
           const SizedBox(height: 4),
-          Text('每日最大复习数: ${settings.maxReviewsPerDay == 0 ? "不限" : settings.maxReviewsPerDay}',
+          Text(
+              '每日最大复习数: ${settings.maxReviewsPerDay == 0 ? "不限" : settings.maxReviewsPerDay}',
               style: TextStyle(fontSize: fontSize)),
           Slider(
             value: settings.maxReviewsPerDay.toDouble(),
             min: 0,
             max: 200,
             divisions: 40,
-            label: settings.maxReviewsPerDay == 0 ? '不限' : settings.maxReviewsPerDay.toString(),
+            label: settings.maxReviewsPerDay == 0
+                ? '不限'
+                : settings.maxReviewsPerDay.toString(),
             onChanged: (v) => prov.updateMaxReviewsPerDay(v.round()),
           ),
           Text(
@@ -289,6 +335,11 @@ class SettingsPage extends StatelessWidget {
     AIProvider aiProv,
     double fontSize,
   ) {
+    Future<void> updateAiSetting(Future<void> Function() update) async {
+      await update();
+      aiProv.refreshSettings();
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -300,11 +351,10 @@ class SettingsPage extends StatelessWidget {
           ),
           value: settings.aiEnabled,
           onChanged: (v) {
-            settingsProv.updateAiEnabled(v);
-            aiProv.refreshSettings();
+            updateAiSetting(() => settingsProv.updateAiEnabled(v));
           },
-            contentPadding: EdgeInsets.zero,
-          ),
+          contentPadding: EdgeInsets.zero,
+        ),
         if (settings.aiEnabled) ...[
           const SizedBox(height: 8),
           SwitchListTile(
@@ -327,9 +377,10 @@ class SettingsPage extends StatelessWidget {
             ),
             obscureText: true,
             style: TextStyle(fontSize: fontSize),
-            controller: TextEditingController(text: settings.aiApiKey)
-              ..selection = TextSelection.collapsed(offset: settings.aiApiKey.length),
-            onChanged: (v) => settingsProv.updateAiApiKey(v),
+            controller: _aiApiKeyController,
+            onChanged: (v) {
+              updateAiSetting(() => settingsProv.updateAiApiKey(v));
+            },
           ),
           const SizedBox(height: 12),
           TextField(
@@ -340,9 +391,10 @@ class SettingsPage extends StatelessWidget {
               isDense: true,
             ),
             style: TextStyle(fontSize: fontSize),
-            controller: TextEditingController(text: settings.aiCustomUrl)
-              ..selection = TextSelection.collapsed(offset: settings.aiCustomUrl.length),
-            onChanged: (v) => settingsProv.updateAiCustomUrl(v),
+            controller: _aiCustomUrlController,
+            onChanged: (v) {
+              updateAiSetting(() => settingsProv.updateAiCustomUrl(v));
+            },
           ),
           const SizedBox(height: 12),
           TextField(
@@ -353,9 +405,10 @@ class SettingsPage extends StatelessWidget {
               isDense: true,
             ),
             style: TextStyle(fontSize: fontSize),
-            controller: TextEditingController(text: settings.aiCustomModel)
-              ..selection = TextSelection.collapsed(offset: settings.aiCustomModel.length),
-            onChanged: (v) => settingsProv.updateAiCustomModel(v),
+            controller: _aiCustomModelController,
+            onChanged: (v) {
+              updateAiSetting(() => settingsProv.updateAiCustomModel(v));
+            },
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
@@ -364,7 +417,8 @@ class SettingsPage extends StatelessWidget {
               labelText: '难度',
               border: const OutlineInputBorder(),
               isDense: true,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             ),
             items: const [
               DropdownMenuItem(value: 'junior', child: Text('初级')),
@@ -372,7 +426,9 @@ class SettingsPage extends StatelessWidget {
               DropdownMenuItem(value: 'senior', child: Text('高级')),
             ],
             onChanged: (v) {
-              if (v != null) settingsProv.updateAiDifficulty(v);
+              if (v != null) {
+                updateAiSetting(() => settingsProv.updateAiDifficulty(v));
+              }
             },
           ),
           const SizedBox(height: 12),
@@ -405,7 +461,9 @@ class SettingsPage extends StatelessWidget {
             max: 2000,
             divisions: 38,
             label: settings.aiMaxTokens.toString(),
-            onChanged: (v) => settingsProv.updateAiMaxTokens(v.round()),
+            onChanged: (v) {
+              updateAiSetting(() => settingsProv.updateAiMaxTokens(v.round()));
+            },
           ),
           DropdownButtonFormField<String>(
             initialValue: settings.aiReasoningEffort,
@@ -413,7 +471,8 @@ class SettingsPage extends StatelessWidget {
               labelText: '推理模式',
               border: const OutlineInputBorder(),
               isDense: true,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             ),
             items: const [
               DropdownMenuItem(value: 'disabled', child: Text('禁用推理')),
@@ -422,16 +481,16 @@ class SettingsPage extends StatelessWidget {
               DropdownMenuItem(value: 'high', child: Text('高 (深度思考)')),
             ],
             onChanged: (v) {
-              if (v != null) settingsProv.updateAiReasoningEffort(v);
+              if (v != null) {
+                updateAiSetting(() => settingsProv.updateAiReasoningEffort(v));
+              }
             },
           ),
           const SizedBox(height: 8),
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
-              onPressed: aiProv.testing
-                  ? null
-                  : () => aiProv.testConnection(),
+              onPressed: aiProv.testing ? null : () => aiProv.testConnection(),
               icon: aiProv.testing
                   ? const SizedBox(
                       width: 16,

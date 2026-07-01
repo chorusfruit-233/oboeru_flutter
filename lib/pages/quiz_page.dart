@@ -59,7 +59,8 @@ class _QuizPageState extends State<QuizPage> {
 
     if (quizProv.finished) {
       if (settings.srsEnabled) {
-        WidgetsBinding.instance.addPostFrameCallback((_) => _recordToSrs(quizProv));
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _recordToSrs(quizProv));
       }
       return _buildResults(context, quizProv, settings, fontSize);
     }
@@ -157,7 +158,9 @@ class _QuizPageState extends State<QuizPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    question.word.pos.isNotEmpty ? '/${question.word.pos}/' : '',
+                    question.word.pos.isNotEmpty
+                        ? '/${question.word.pos}/'
+                        : '',
                     style: TextStyle(
                       fontSize: fontSize,
                       color: Colors.grey,
@@ -173,12 +176,15 @@ class _QuizPageState extends State<QuizPage> {
               children: question.options.map((option) {
                 final isSelected = question.selectedAnswer == option;
                 final isCorrectOption = option == question.correctAnswer;
-                final showResult = question.isAnswered && (isSelected || isCorrectOption);
+                final showResult =
+                    question.isAnswered && (isSelected || isCorrectOption);
 
                 return OptionButton(
                   label: option,
                   isSelected: isSelected,
-                  isCorrect: showResult ? (isSelected ? question.isCorrect : true) : null,
+                  isCorrect: showResult
+                      ? (isSelected ? question.isCorrect : true)
+                      : null,
                   fontSize: fontSize,
                   onTap: question.isAnswered
                       ? null
@@ -208,10 +214,12 @@ class _QuizPageState extends State<QuizPage> {
     );
   }
 
-  Widget _buildResults(BuildContext context, QuizProvider prov, AppSettings settings, double fontSize) {
+  Widget _buildResults(BuildContext context, QuizProvider prov,
+      AppSettings settings, double fontSize) {
     final total = prov.totalCount;
     final correct = prov.correctCount;
-    final accuracy = total > 0 ? (correct / total * 100).toStringAsFixed(0) : '0';
+    final accuracy =
+        total > 0 ? (correct / total * 100).toStringAsFixed(0) : '0';
 
     return Scaffold(
       appBar: AppBar(
@@ -250,7 +258,8 @@ class _QuizPageState extends State<QuizPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildStat('正确', correct.toString(), Colors.green, fontSize),
-                  _buildStat('错误', prov.incorrectCount.toString(), Colors.red, fontSize),
+                  _buildStat('错误', prov.incorrectCount.toString(), Colors.red,
+                      fontSize),
                   _buildStat('总题', total.toString(), Colors.blue, fontSize),
                 ],
               ),
@@ -259,11 +268,13 @@ class _QuizPageState extends State<QuizPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.timeline, size: fontSize * 0.9, color: Colors.green),
+                    Icon(Icons.timeline,
+                        size: fontSize * 0.9, color: Colors.green),
                     const SizedBox(width: 6),
                     Text(
                       '已按答题结果更新复习进度',
-                      style: TextStyle(fontSize: fontSize * 0.8, color: Colors.green),
+                      style: TextStyle(
+                          fontSize: fontSize * 0.8, color: Colors.green),
                     ),
                   ],
                 ),
@@ -272,36 +283,39 @@ class _QuizPageState extends State<QuizPage> {
                 const SizedBox(height: 16),
                 Text(
                   '以下单词需要复习:',
-                  style: TextStyle(fontSize: fontSize * 0.85, color: Colors.red),
+                  style:
+                      TextStyle(fontSize: fontSize * 0.85, color: Colors.red),
                 ),
                 const SizedBox(height: 8),
                 ...prov.incorrectWords.map((w) => Text(
-                  '${w.word} - ${w.meaning}',
-                  style: TextStyle(fontSize: fontSize * 0.85),
-                )),
+                      '${w.word} - ${w.meaning}',
+                      style: TextStyle(fontSize: fontSize * 0.85),
+                    )),
               ],
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                height: 44,
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => ReviewPage(
-                          words: prov.incorrectWords,
-                          title: '复习错词',
+              if (prov.incorrectWords.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  height: 44,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ReviewPage(
+                            words: prov.incorrectWords,
+                            title: '复习错词',
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.replay),
-                  label: Text(
-                    '复习错词 (${prov.incorrectWords.length})',
-                    style: TextStyle(fontSize: fontSize),
+                      );
+                    },
+                    icon: const Icon(Icons.replay),
+                    label: Text(
+                      '复习错词 (${prov.incorrectWords.length})',
+                      style: TextStyle(fontSize: fontSize),
+                    ),
                   ),
                 ),
-              ),
+              ],
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
@@ -335,7 +349,10 @@ class _QuizPageState extends State<QuizPage> {
       children: [
         Text(
           value,
-          style: TextStyle(fontSize: fontSize * 1.5, fontWeight: FontWeight.bold, color: color),
+          style: TextStyle(
+              fontSize: fontSize * 1.5,
+              fontWeight: FontWeight.bold,
+              color: color),
         ),
         Text(label, style: TextStyle(fontSize: fontSize * 0.85)),
       ],

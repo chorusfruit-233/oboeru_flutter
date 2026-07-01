@@ -42,7 +42,7 @@ class WordCard extends StatelessWidget {
     return Card(
       key: const ValueKey('front'),
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -100,7 +100,7 @@ class WordCard extends StatelessWidget {
       key: const ValueKey('back'),
       elevation: 4,
       color: Theme.of(context).colorScheme.primaryContainer,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -159,14 +159,17 @@ class WordCard extends StatelessWidget {
                     Row(
                       children: [
                         Icon(
-                          exampleSource == 'ai' ? Icons.auto_awesome : Icons.bookmark_border,
+                          exampleSource == 'ai'
+                              ? Icons.auto_awesome
+                              : Icons.bookmark_border,
                           size: fontSize * 0.85,
                           color: Colors.black54,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           exampleSource == 'ai' ? 'AI 例句' : '词库例句',
-                          style: TextStyle(fontSize: fontSize * 0.75, color: Colors.black54),
+                          style: TextStyle(
+                              fontSize: fontSize * 0.75, color: Colors.black54),
                         ),
                       ],
                     ),
@@ -179,7 +182,9 @@ class WordCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               example!,
-                              style: TextStyle(fontSize: fontSize, fontStyle: FontStyle.italic),
+                              style: TextStyle(
+                                  fontSize: fontSize,
+                                  fontStyle: FontStyle.italic),
                             ),
                           ),
                           if (onSpeakExample != null)
@@ -196,7 +201,8 @@ class WordCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           word.exampleMeaning,
-                          style: TextStyle(fontSize: fontSize * 0.85, color: Colors.black54),
+                          style: TextStyle(
+                              fontSize: fontSize * 0.85, color: Colors.black54),
                         ),
                       ],
                     ],
@@ -210,10 +216,13 @@ class WordCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 '正在生成例句...',
-                style: TextStyle(fontSize: fontSize * 0.75, color: Colors.black54),
+                style:
+                    TextStyle(fontSize: fontSize * 0.75, color: Colors.black54),
               ),
             ],
-            if (onGenerateExample != null && example == null && !aiGenerating) ...[
+            if (onGenerateExample != null &&
+                example == null &&
+                !aiGenerating) ...[
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
@@ -253,7 +262,8 @@ class WordCard extends StatelessWidget {
             Expanded(
               child: Text(
                 en,
-                style: TextStyle(fontSize: fontSize, fontStyle: FontStyle.italic),
+                style:
+                    TextStyle(fontSize: fontSize, fontStyle: FontStyle.italic),
               ),
             ),
             if (onSpeakExample != null)

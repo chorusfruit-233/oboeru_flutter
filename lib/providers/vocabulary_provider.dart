@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../models/word.dart';
-import '../services/vocabulary_service.dart';
 import '../services/settings_service.dart';
+import '../services/vocabulary_service.dart';
 import '../services/storage_service.dart';
 
 class VocabularyProvider extends ChangeNotifier {
@@ -32,25 +32,24 @@ class VocabularyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> importAndLoad(String sourcePath) async {
+  Future<String?> importAndLoad(String sourcePath) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
+    String? savedPath;
     try {
       final storage = StorageService.instance;
-      final savedPath = await storage.copyVocabToAppDir(sourcePath);
+      savedPath = await storage.copyVocabToAppDir(sourcePath);
       _allWords = await _vocabService.loadFromFile(savedPath);
-
-      final settings = await _settingsService.load();
-      final updated = settings.copyWith(vocabFilePath: savedPath);
-      await _settingsService.save(updated);
     } catch (e) {
       _error = '导入词库失败: $e';
+      savedPath = null;
     }
 
     _isLoading = false;
     notifyListeners();
+    return savedPath;
   }
 
   void clear() {
