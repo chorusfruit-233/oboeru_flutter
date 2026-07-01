@@ -1,18 +1,24 @@
+import 'dart:convert';
 import 'dart:io' show Platform, Process;
 import 'package:flutter_tts/flutter_tts.dart';
 
 class TTSService {
   FlutterTts? _tts;
+  bool _flutterTtsInitialized = false;
 
-  Future<void> speak(String text, {String language = 'en'}) async {
-    if (Platform.isLinux) {
-      await _speakLinux(text, language);
-    } else if (Platform.isMacOS) {
-      await _speakMacOs(text);
-    } else if (Platform.isWindows) {
-      await _speakWindows(text);
-    } else {
-      await _speakFlutterTts(text, language);
+  Future<bool> speak(String text, {String language = 'en'}) async {
+    try {
+      if (Platform.isLinux) {
+        return _speakLinux(text, language);
+      } else if (Platform.isMacOS) {
+        return _speakMacOs(text);
+      } else if (Platform.isWindows) {
+        return _speakWindows(text);
+      } else {
+        return _speakFlutterTts(text, language);
+      }
+    } catch (_) {
+      return false;
     }
   }
 
@@ -20,34 +26,47 @@ class TTSService {
     await _tts?.stop();
   }
 
-  Future<void> _speakLinux(String text, String lang) async {
-    try {
-      await Process.run('espeak', ['-v', lang, '-s', '140', '--', text]);
-    } catch (_) {}
+  Future<bool> _speakLinux(String text, String lang) async {
+    final result =
+        await Process.run('espeak', ['-v', lang, '-s', '140', '--', text]);
+    return result.exitCode == 0;
   }
 
-  Future<void> _speakMacOs(String text) async {
-    try {
-      await Process.run('say', ['-v', 'Samantha', text]);
-    } catch (_) {}
+  Future<bool> _speakMacOs(String text) async {
+    final result = await Process.run('say', ['-v', 'Samantha', text]);
+    return result.exitCode == 0;
   }
 
-  Future<void> _speakWindows(String text) async {
-    try {
-      await Process.run('powershell', [
-        '-Command',
-        'Add-Type -AssemblyName System.Speech; '
-        '\$speak = New-Object System.Speech.Synthesis.SpeechSynthesizer; '
-        '\$speak.Speak("$text")',
-      ]);
-    } catch (_) {}
+  Future<bool> _speakWindows(String text) async {
+    final encodedText = jsonEncode(text).replaceAll("'", "''");
+    final result = await Process.run('powershell', [
+      '-NoProfile',
+      '-Command',
+      'Add-Type -AssemblyName System.Speech; '
+          '\$speak = New-Object System.Speech.Synthesis.SpeechSynthesizer; '
+          "\$text = ConvertFrom-Json '$encodedText'; "
+          '\$speak.Speak(\$text)',
+    ]);
+    return result.exitCode == 0;
   }
 
-  Future<void> _speakFlutterTts(String text, String lang) async {
-    try {
-      _tts ??= FlutterTts();
-      await _tts!.setLanguage(lang);
-      await _tts!.speak(text);
-    } catch (_) {}
+  Future<bool> _speakFlutterTts(String text, String lang) async {
+    await _initFlutterTts();
+    await _tts!.setLanguage(lang);
+    final result = Platform.isAndroid
+        ? await _tts!.speak(text, focus: true)
+        : await _tts!.speak(text);
+    return result == 1 || result == true;
+  }
+
+  Future<void> _initFlutterTts() async {
+    _tts ??= FlutterTts();
+    if (_flutterTtsInitialized) return;
+
+    await _tts!.awaitSpeakCompletion(true);
+    _tts!.setCompletionHandler(() {});
+    _tts!.setErrorHandler((_) {});
+    _tts!.setCancelHandler(() {});
+    _flutterTtsInitialized = true;
   }
 }

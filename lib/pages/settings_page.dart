@@ -593,6 +593,16 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
+          if (ttsProv.lastError != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              ttsProv.lastError!,
+              style: TextStyle(
+                fontSize: fontSize * 0.8,
+                color: Colors.red.shade700,
+              ),
+            ),
+          ],
         ],
       ],
     );
