@@ -8,8 +8,8 @@ class TTSService {
     try {
       await _initFlutterTts();
       await _tts!.setLanguage(language);
-      final result = await _tts!.speak(text);
-      return result == 1 || result == true;
+      await _tts!.speak(text);
+      return true;
     } catch (_) {
       return false;
     }
