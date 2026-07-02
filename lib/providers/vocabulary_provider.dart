@@ -52,6 +52,26 @@ class VocabularyProvider extends ChangeNotifier {
     return savedPath;
   }
 
+  Future<String?> importBytesAndLoad(String name, Uint8List bytes) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    String? savedPath;
+    try {
+      final storage = StorageService.instance;
+      savedPath = await storage.saveVocabContent(name, bytes);
+      _allWords = await _vocabService.loadFromFile(savedPath);
+    } catch (e) {
+      _error = '导入词库失败: $e';
+      savedPath = null;
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return savedPath;
+  }
+
   void clear() {
     _allWords = [];
     notifyListeners();

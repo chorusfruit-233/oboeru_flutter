@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import '../models/settings.dart';
@@ -208,19 +209,27 @@ class _SettingsPageState extends State<SettingsPage> {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['txt', 'json'],
+      withData: kIsWeb,
     );
 
-    if (result != null && result.files.single.path != null) {
-      final savedPath =
-          await vocabProv.importAndLoad(result.files.single.path!);
-      if (savedPath != null) {
-        await settingsProv.updateVocabFilePath(savedPath);
-      }
-      if (savedPath != null && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('词库导入成功')),
-        );
-      }
+    if (result == null) return;
+
+    final file = result.files.single;
+    final savedPath = kIsWeb
+        ? file.bytes == null
+            ? null
+            : await vocabProv.importBytesAndLoad(file.name, file.bytes!)
+        : file.path == null
+            ? null
+            : await vocabProv.importAndLoad(file.path!);
+
+    if (savedPath != null) {
+      await settingsProv.updateVocabFilePath(savedPath);
+    }
+    if (savedPath != null && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('词库导入成功')),
+      );
     }
   }
 
